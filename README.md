@@ -29,8 +29,10 @@ I built this to export a multi-terabyte table that the usual tools (Azure Storag
 
 For small and medium tables, one worker is enough:
 
+Requires Python 3.9+ (see [Requirements](#requirements)).
+
 ```bash
-pip install -r requirements.txt
+pip install azure-data-tables boto3
 
 export AZURE_STORAGE_CONNECTION_STRING="TableEndpoint=https://<account>.table.core.windows.net/;SharedAccessSignature=..."
 export AZURE_TABLE_NAME=mytable
@@ -118,8 +120,14 @@ Each worker loses at most the chunk it was building. Keep `workers/` and `export
 
 ## Requirements
 
-- Python 3.9+
-- `pip install -r requirements.txt` (`azure-data-tables`, `boto3`)
+- **Python 3.9 or newer** (`python3 --version` to check)
+- **Python packages:** `azure-data-tables` and `boto3`. Install them with:
+
+  ```bash
+  pip install azure-data-tables boto3
+  ```
+
+  or, from a clone of this repo, `pip install -r requirements.txt`. Using a virtualenv (`python3 -m venv .venv && source .venv/bin/activate`) keeps them separate from your system Python.
 - `run_workers.sh` needs bash and GNU `shuf` (on macOS: `brew install coreutils`)
 - AWS credentials with `s3:PutObject` on the target bucket and prefix, from the standard boto3 chain (instance role, `AWS_PROFILE`, or `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY`)
 - Azure credentials, either:
