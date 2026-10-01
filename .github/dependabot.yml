@@ -2,6 +2,8 @@ version: 2
 updates:
   - package-ecosystem: pip
     directory: /
+    # Keep minimum versions loose; only raise them when a release falls outside the range.
+    versioning-strategy: increase-if-necessary
     schedule:
       interval: monthly
   - package-ecosystem: github-actions
