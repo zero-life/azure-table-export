@@ -29,8 +29,10 @@ I built this to export a multi-terabyte table that the usual tools (Azure Storag
 
 For small and medium tables, one worker is enough:
 
+Requires Python 3.9+ (see [Requirements](#requirements)).
+
 ```bash
-pip install -r requirements.txt
+pip install azure-data-tables boto3
 
 export AZURE_STORAGE_CONNECTION_STRING="TableEndpoint=https://<account>.table.core.windows.net/;SharedAccessSignature=..."
 export AZURE_TABLE_NAME=mytable
@@ -116,10 +118,30 @@ MAX_PARALLEL=20 nohup bash run_workers.sh > run.log 2>&1 &
 
 Each worker loses at most the chunk it was building. Keep `workers/` and `export_work/` on persistent disk.
 
+## Benchmark
+
+A real export of a production table, using the planner and `run_workers.sh`:
+
+| | |
+|---|---|
+| Source | Azure Table Storage, **3.5 TB** |
+| Output | **2.2 TB** of gzipped CSV in S3 (`GZIP=true`) |
+| Parallel workers | `MAX_PARALLEL=20` |
+| Instance | AWS EC2 `c8a.2xlarge` (8 vCPU, 16 GiB) |
+| Total time | **about 18 hours** (roughly 195 GB/hour, or 54 MB/s, of source data) |
+
+That covers reading from Azure, writing CSV, gzip compression and uploading to S3. Your throughput will depend on the table's partition layout, row size, Azure throttling, and the network path between Azure and AWS.
+
 ## Requirements
 
-- Python 3.9+
-- `pip install -r requirements.txt` (`azure-data-tables`, `boto3`)
+- **Python 3.9 or newer** (`python3 --version` to check)
+- **Python packages:** `azure-data-tables` and `boto3`. Install them with:
+
+  ```bash
+  pip install azure-data-tables boto3
+  ```
+
+  or, from a clone of this repo, `pip install -r requirements.txt`. Using a virtualenv (`python3 -m venv .venv && source .venv/bin/activate`) keeps them separate from your system Python.
 - `run_workers.sh` needs bash and GNU `shuf` (on macOS: `brew install coreutils`)
 - AWS credentials with `s3:PutObject` on the target bucket and prefix, from the standard boto3 chain (instance role, `AWS_PROFILE`, or `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY`)
 - Azure credentials, either:
