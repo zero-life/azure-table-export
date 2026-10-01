@@ -1,2 +1,2 @@
-azure-data-tables>=12.4
+azure-data-tables>=12.7.0
 boto3>=1.26
