@@ -1,0 +1,18 @@
+# Runtime state (worker configs, checkpoints, logs, local chunks)
+workers/
+export_work/
+*.log
+*.checkpoint.json
+*.csv
+*.csv.gz
+
+# Never commit credentials
+.env
+*.env
+
+__pycache__/
+*.pyc
+.venv/
+venv/
+.DS_Store
+.ruff_cache/
